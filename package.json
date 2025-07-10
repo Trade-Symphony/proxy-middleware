@@ -1,5 +1,5 @@
 {
-	"name": "proxy",
+	"name": "proxy-middleware",
 	"version": "1.0.0",
 	"scripts": {
 		"dev": "wrangler dev",
