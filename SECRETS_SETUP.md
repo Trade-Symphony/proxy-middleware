@@ -25,7 +25,7 @@ wrangler secret put API_SERVICE_URL
 
 When prompted, enter your actual API service URL (e.g., https://your-actual-api.com)
 
-## Step 2: Set API Key as a secret
+## Step 3: Set API Key as a secret
 
 ```bash
 wrangler secret put API_KEY
@@ -33,7 +33,7 @@ wrangler secret put API_KEY
 
 When prompted, enter your actual API key
 
-## Step 3: Set ALLOWED_ORIGIN as a secret
+## Step 4: Set ALLOWED_ORIGIN as a secret
 
 ```bash
 wrangler secret put ALLOWED_ORIGIN
@@ -41,7 +41,7 @@ wrangler secret put ALLOWED_ORIGIN
 
 When prompted, enter your actual allowed origin (e.g., https://yourfrontend.com)
 
-## Step 4: List all secrets (optional - to verify)
+## Step 5: List all secrets (optional - to verify)
 
 ```bash
 wrangler secret list
