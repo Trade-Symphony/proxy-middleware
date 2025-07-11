@@ -24,6 +24,7 @@ export function isStandardResponse(data: any): data is StandardResponse {
     data &&
     typeof data === 'object' &&
     'success' in data &&
+    'message' in data &&
     'timestamp' in data &&
     'data' in data
   );
