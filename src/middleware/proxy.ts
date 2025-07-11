@@ -1,6 +1,6 @@
 import type { Context } from 'hono';
-import type { ProxyConfig, ProxyRequestOptions, ProxyResponseMetadata } from '../types/index.js';
-import { createStandardResponse, wrapInStandardFormat, isStandardResponse } from '../utils/response.js';
+import type { ProxyConfig, ProxyRequestOptions } from '../types/index.js';
+import { wrapInStandardFormat, isStandardResponse } from '../utils/response.js';
 import { ConfigurationError, ProxyError, handleError } from '../utils/errors.js';
 import { createPreflightHeaders, applyCorsHeaders } from '../utils/cors.js';
 
