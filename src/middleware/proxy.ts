@@ -63,12 +63,11 @@ function getProxyConfig(env: any): ProxyConfig {
  * Build the target URL for the proxy request
  */
 function buildTargetUrl(originalUrl: string, apiServiceUrl: string): URL {
-  const originalPath = new URL(originalUrl).pathname;
-  const apiPath = originalPath.replace(/^\/api/, "");
+  const originalUrlObj = new URL(originalUrl);
+  const apiPath = originalUrlObj.pathname.replace(/^\/api/, "");
   const targetUrl = new URL(apiPath || "/", apiServiceUrl);
 
   // Preserve query parameters
-  const originalUrlObj = new URL(originalUrl);
   originalUrlObj.searchParams.forEach((value, key) => {
     targetUrl.searchParams.set(key, value);
   });
