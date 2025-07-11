@@ -1369,9 +1369,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"proxy@workspace:.":
+"proxy-middleware@workspace:.":
   version: 0.0.0-use.local
-  resolution: "proxy@workspace:."
+  resolution: "proxy-middleware@workspace:."
   dependencies:
     hono: "npm:^4.8.4"
     wrangler: "npm:^4.24.3"
