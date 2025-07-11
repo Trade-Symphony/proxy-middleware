@@ -11,7 +11,8 @@ Secrets override these variables in production environments.
 {
   "vars": {
     "API_SERVICE_URL": "https://api.example.com",
-    "API_KEY": "your-api-key-here"
+    "API_KEY": "your-api-key-here",
+    "ALLOWED_ORIGIN": "https://yourdomain.com"
   }
 }
 ```
@@ -32,7 +33,15 @@ wrangler secret put API_KEY
 
 When prompted, enter your actual API key
 
-## Step 3: List all secrets (optional - to verify)
+## Step 3: Set ALLOWED_ORIGIN as a secret
+
+```bash
+wrangler secret put ALLOWED_ORIGIN
+```
+
+When prompted, enter your actual allowed origin (e.g., https://yourfrontend.com)
+
+## Step 4: List all secrets (optional - to verify)
 
 ```bash
 wrangler secret list
@@ -46,10 +55,12 @@ If you have staging/production environments:
 # For staging
 wrangler secret put API_SERVICE_URL --env staging
 wrangler secret put API_KEY --env staging
+wrangler secret put ALLOWED_ORIGIN --env staging
 
 # For production
 wrangler secret put API_SERVICE_URL --env production
 wrangler secret put API_KEY --env production
+wrangler secret put ALLOWED_ORIGIN --env production
 ```
 
 ## Notes:
