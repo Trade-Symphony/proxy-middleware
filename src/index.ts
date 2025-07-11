@@ -16,7 +16,8 @@ app.all("*", (c) => {
   return c.json(createStandardResponse(
     false,
     null,
-    "API route not found"
+    "API route not found",
+    404
   ), 404);
 });
 

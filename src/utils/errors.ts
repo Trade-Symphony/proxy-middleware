@@ -44,5 +44,5 @@ export function handleError(error: unknown, statusCode: number = 500) {
     message = 'Unknown error occurred';
   }
 
-  return createStandardResponse(false, null, message);
+  return createStandardResponse(false, null, message, statusCode);
 }

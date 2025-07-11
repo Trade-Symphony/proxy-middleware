@@ -5,6 +5,7 @@ export interface StandardResponse<T = any> {
   success: boolean;
   message: string | null;
   timestamp: string;
+  statusCode: number;
   data: T;
 }
 

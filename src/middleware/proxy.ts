@@ -141,7 +141,8 @@ async function processResponseBody(response: Response): Promise<any> {
       return wrapInStandardFormat(
         responseData,
         response.ok,
-        response.ok ? undefined : `API returned ${response.status}`
+        response.ok ? undefined : `API returned ${response.status}`,
+        response.status
       );
     } catch (jsonError) {
       console.warn(`[PROXY] Failed to parse JSON response: ${jsonError}`);

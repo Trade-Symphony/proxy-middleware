@@ -6,12 +6,14 @@ import type { StandardResponse } from '../types/index.js';
 export function createStandardResponse<T>(
   success: boolean,
   data: T,
-  message: string | null = null
+  message: string | null = null,
+  statusCode: number = success ? 200 : 500
 ): StandardResponse<T> {
   return {
     success,
     message,
     timestamp: new Date().toISOString(),
+    statusCode,
     data,
   };
 }
@@ -26,6 +28,7 @@ export function isStandardResponse(data: any): data is StandardResponse {
     'success' in data &&
     'message' in data &&
     'timestamp' in data &&
+    'statusCode' in data &&
     'data' in data
   );
 }
@@ -36,7 +39,8 @@ export function isStandardResponse(data: any): data is StandardResponse {
 export function wrapInStandardFormat<T>(
   data: T,
   success: boolean,
-  message?: string
+  message?: string,
+  statusCode?: number
 ): StandardResponse<T> {
   if (isStandardResponse(data)) {
     return data;
@@ -45,6 +49,7 @@ export function wrapInStandardFormat<T>(
   return createStandardResponse(
     success,
     data,
-    message || (success ? null : 'Request failed')
+    message || (success ? null : 'Request failed'),
+    statusCode
   );
 }
