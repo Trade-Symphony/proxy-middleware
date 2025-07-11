@@ -68,6 +68,15 @@ app.all("/api/*", async (c) => {
     ), 500);
   }
 
+  if (!ALLOWED_ORIGIN) {
+    console.error("ALLOWED_ORIGIN environment variable is not configured");
+    return c.json(createStandardResponse(
+      false,
+      null,
+      "Service configuration error"
+    ), 500);
+  }
+
   try {
     // Extract the path after /api
     const originalPath = new URL(c.req.url).pathname;
