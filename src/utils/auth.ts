@@ -9,7 +9,7 @@ import { DecodedIdToken } from 'firebase-admin/auth';
 const WHITELISTED_PATHS = [
   '/health',
   '/api/health',
-  '/api/public',
+  '/api/public/*',
 ];
 
 /**
