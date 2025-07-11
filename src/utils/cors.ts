@@ -22,7 +22,7 @@ export const EXPOSED_HEADERS = ['X-Proxied-By'];
 export function createCorsHeaders(allowedOrigin: string): Headers {
   const headers = new Headers();
 
-  headers.set('Access-Control-Allow-Origin', allowedOrigin || '*');
+  headers.set('Access-Control-Allow-Origin', allowedOrigin == null ? '*' : allowedOrigin);
 
   Object.entries(DEFAULT_CORS_HEADERS).forEach(([key, value]) => {
     headers.set(key, value);
