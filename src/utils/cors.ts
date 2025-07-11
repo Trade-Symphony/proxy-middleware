@@ -21,15 +21,15 @@ export const EXPOSED_HEADERS = ['X-Proxied-By'];
  */
 export function createCorsHeaders(allowedOrigin: string): Headers {
   const headers = new Headers();
-  
+
   headers.set('Access-Control-Allow-Origin', allowedOrigin || '*');
-  
+
   Object.entries(DEFAULT_CORS_HEADERS).forEach(([key, value]) => {
     headers.set(key, value);
   });
-  
+
   headers.set('Access-Control-Expose-Headers', EXPOSED_HEADERS.join(', '));
-  
+
   return headers;
 }
 
@@ -46,7 +46,7 @@ export function createPreflightHeaders(allowedOrigin: string): Headers {
  */
 export function applyCorsHeaders(headers: Headers, allowedOrigin: string): void {
   const corsHeaders = createCorsHeaders(allowedOrigin);
-  
+
   corsHeaders.forEach((value, key) => {
     headers.set(key, value);
   });
