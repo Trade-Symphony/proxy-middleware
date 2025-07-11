@@ -34,7 +34,21 @@ app.get("/health", (c) => {
 
 // Proxy middleware for /api/* routes
 app.all("/api/*", async (c) => {
-  const { API_SERVICE_URL, API_KEY } = c.env;
+  const { API_SERVICE_URL, API_KEY, ALLOWED_ORIGIN } = c.env;
+
+  // Handle OPTIONS preflight requests
+  if (c.req.method === 'OPTIONS') {
+    const responseHeaders = new Headers();
+    responseHeaders.set('Access-Control-Allow-Origin', ALLOWED_ORIGIN || '*');
+    responseHeaders.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
+    responseHeaders.set('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-API-KEY, X-Requested-With');
+    responseHeaders.set('Access-Control-Max-Age', '86400');
+
+    return new Response(null, {
+      status: 204,
+      headers: responseHeaders,
+    });
+  }
 
   if (!API_SERVICE_URL) {
     console.error("API_SERVICE_URL environment variable is not configured");
@@ -135,6 +149,13 @@ app.all("/api/*", async (c) => {
 
     // Add proxy identification header
     responseHeaders.set('X-Proxied-By', 'Trade-Symphony-Proxy');
+
+    // Add CORS headers
+    responseHeaders.set('Access-Control-Allow-Origin', ALLOWED_ORIGIN || '*');
+    responseHeaders.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
+    responseHeaders.set('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-API-KEY, X-Requested-With');
+    responseHeaders.set('Access-Control-Expose-Headers', 'X-Proxied-By');
+    responseHeaders.set('Access-Control-Max-Age', '86400');
 
     // Parse the response body to wrap it in standard format
     let responseData;
