@@ -54,9 +54,7 @@ export async function verifyFirebaseToken(idToken: string): Promise<DecodedIdTok
  * Check if a path is whitelisted (doesn't require authentication)
  */
 export function isPathWhitelisted(path: string): boolean {
-  const allWhitelistedPaths = [...WHITELISTED_PATHS];
-
-  return allWhitelistedPaths.some(whitelistedPath => {
+  return WHITELISTED_PATHS.some(whitelistedPath => {
     // Exact match
     if (path === whitelistedPath) {
       return true;
