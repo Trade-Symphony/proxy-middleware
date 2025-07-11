@@ -214,7 +214,7 @@ app.all("*", (c) => {
   return c.json(createStandardResponse(
     false,
     null,
-    "This proxy only handles /api/* routes and /health"
+    "API route not found"
   ), 404);
 });
 
