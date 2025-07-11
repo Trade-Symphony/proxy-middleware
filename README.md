@@ -5,6 +5,7 @@ A Cloudflare Worker-based proxy middleware that forwards API requests to backend
 ## Features
 
 - **Standardized Response Format**: All responses follow a consistent format with success status, message, timestamp, and data
+- **Firebase Authentication**: Optional Firebase token-based authentication with configurable whitelisting
 - **Request Forwarding**: Proxies all `/api/*` routes to the configured API service
 - **Header Preservation**: Maintains original request headers while filtering out internal Cloudflare headers
 - **Query Parameter Support**: Preserves all query parameters in forwarded requests
@@ -94,6 +95,28 @@ For production deployments, override the sensitive values using Cloudflare Worke
 
 - **API_SERVICE_URL**: The base URL of your target API service
 - **API_KEY**: The API key that will be sent as `X-API-KEY` header to authenticate requests to the target API
+- **ALLOWED_ORIGIN**: The allowed CORS origin
+
+#### Firebase Authentication (Optional)
+
+- **FIREBASE_PROJECT_ID**: Your Firebase project ID
+- **FIREBASE_PRIVATE_KEY**: Your Firebase service account private key (with newlines preserved)
+- **FIREBASE_CLIENT_EMAIL**: Your Firebase service account client email
+- **AUTH_REQUIRED**: Set to "false" to disable authentication (default: "true" when Firebase config is present)
+- **AUTH_WHITELIST_PATHS**: Comma-separated list of paths that don't require authentication (e.g., "/api/public/_,/api/webhooks/_")
+
+#### Default Whitelisted Paths
+
+The following paths are automatically whitelisted and don't require authentication:
+
+- `/health`
+- `/api/health`
+- `/api/public`
+- `/api/auth/login`
+- `/api/auth/register`
+- `/api/auth/forgot-password`
+
+You can add additional whitelisted paths using the `AUTH_WHITELIST_PATHS` environment variable.
 
 > **Security Note**: Use placeholder values in `wrangler.jsonc` and set actual production values as secrets. Secrets always take precedence over environment variables.
 
@@ -120,16 +143,26 @@ For production deployments, override the sensitive values using Cloudflare Worke
 # Health check
 curl https://your-proxy.workers.dev/health
 
-# Proxy API requests
-curl https://your-proxy.workers.dev/api/users?limit=10
-# Forwards to: https://your-api-service.com/users?limit=10
+# Proxy API requests without authentication (if path is whitelisted)
+curl https://your-proxy.workers.dev/api/public/status
 
-# POST request with body
+# Proxy API requests with Firebase authentication
+curl https://your-proxy.workers.dev/api/users?limit=10 \
+  -H "Authorization: Bearer <firebase-id-token>"
+
+# POST request with authentication
 curl -X POST https://your-proxy.workers.dev/api/users \
   -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <firebase-id-token>" \
   -d '{"name": "John", "email": "john@example.com"}'
-# Forwards to: https://your-api-service.com/users
 ```
+
+### Authentication Flow
+
+1. **Client obtains Firebase ID token** by authenticating with Firebase Auth
+2. **Client includes token** in Authorization header as `Bearer <token>`
+3. **Proxy validates token** against Firebase before forwarding request
+4. **Whitelisted paths** bypass authentication automatically
 
 ## Development
 
@@ -160,9 +193,34 @@ yarn deploy
 
 ## Error Handling
 
-- **500**: Service configuration errors (missing API_SERVICE_URL or API_KEY)
+- **401**: Authentication failed (invalid or missing Firebase token)
+- **500**: Service configuration errors (missing API_SERVICE_URL, API_KEY, or Firebase config)
 - **502**: Proxy request failures (network errors, invalid responses)
 - **404**: Non-API routes (only `/api/*` and `/health` are supported)
+
+## Authentication Error Examples
+
+**Missing Authorization Header:**
+
+```json
+{
+  "success": false,
+  "message": "Authorization header with Bearer token is required",
+  "timestamp": "2025-07-12T10:30:00.000Z",
+  "data": null
+}
+```
+
+**Invalid Firebase Token:**
+
+```json
+{
+  "success": false,
+  "message": "Invalid or expired authentication token",
+  "timestamp": "2025-07-12T10:30:00.000Z",
+  "data": null
+}
+```
 
 ## Observability
 
