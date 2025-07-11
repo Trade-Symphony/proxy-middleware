@@ -168,6 +168,10 @@ app.all("/api/*", async (c) => {
         // If the response is already in standard format, return as-is
         if (responseData && typeof responseData === 'object' &&
           'success' in responseData && 'timestamp' in responseData && 'data' in responseData) {
+          // Set headers on context
+          responseHeaders.forEach((value, key) => {
+            c.res.headers.set(key, value);
+          });
           return c.json(responseData, response.status as any);
         }
 
@@ -178,6 +182,10 @@ app.all("/api/*", async (c) => {
           response.ok ? null : `API returned ${response.status}`
         );
 
+        // Set headers on context
+        responseHeaders.forEach((value, key) => {
+          c.res.headers.set(key, value);
+        });
         return c.json(wrappedResponse, response.status as any);
       } catch (jsonError) {
         console.warn(`[PROXY] Failed to parse JSON response: ${jsonError}`);
