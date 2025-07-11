@@ -95,7 +95,7 @@ function prepareRequestHeaders(originalHeaders: Headers, config: ProxyConfig, co
   forwardHeaders.set('X-Forwarded-Host', context.req.header('host') || 'unknown');
 
   // Add API key header
-  forwardHeaders.set('X-API-KEY', config.apiKey);
+  forwardHeaders.set('X-Api-Key', config.apiKey);
 
   return forwardHeaders;
 }
