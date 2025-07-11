@@ -34,7 +34,7 @@ const SKIP_RESPONSE_HEADERS = new Set([
 /**
  * Validate proxy configuration from environment variables
  */
-function validateProxyConfig(env: any): ProxyConfig {
+function getProxyConfig(env: any): ProxyConfig {
   const { API_SERVICE_URL, API_KEY, ALLOWED_ORIGIN } = env;
 
   if (!API_SERVICE_URL) {
@@ -205,7 +205,7 @@ function handlePreflightRequest(config: ProxyConfig): Response {
  */
 export async function proxyMiddleware(c: Context): Promise<Response> {
   try {
-    const config = validateProxyConfig(c.env);
+    const config = getProxyConfig(c.env);
 
     // Handle OPTIONS preflight requests
     if (c.req.method === 'OPTIONS') {
