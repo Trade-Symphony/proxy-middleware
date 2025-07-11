@@ -74,24 +74,15 @@ The basic configuration should be defined in your `wrangler.jsonc`:
 {
   "vars": {
     "API_SERVICE_URL": "https://api.example.com",
-    "API_KEY": "your-api-key-here"
+    "API_KEY": "your-api-key-here",
+    "ALLOWED_ORIGIN": "https://yourdomain.com"
   }
 }
 ```
 
 ### Using Secrets for Production (Override Environment Variables)
 
-For production deployments, override the sensitive values using Cloudflare Workers secrets:
-
-```bash
-# Set production API service URL (overrides wrangler.jsonc)
-wrangler secret put API_SERVICE_URL
-# Enter: https://your-production-api.com
-
-# Set production API key (overrides wrangler.jsonc)
-wrangler secret put API_KEY
-# Enter: your-actual-production-api-key
-```
+For production deployments, override the sensitive values using Cloudflare Workers secrets. Check [SECRETS_SETUP.md](SECRETS_SETUP.md) for detailed instructions.
 
 ### How it Works
 
