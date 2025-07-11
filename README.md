@@ -103,7 +103,6 @@ For production deployments, override the sensitive values using Cloudflare Worke
 - **FIREBASE_PRIVATE_KEY**: Your Firebase service account private key (with newlines preserved)
 - **FIREBASE_CLIENT_EMAIL**: Your Firebase service account client email
 - **AUTH_REQUIRED**: Set to "false" to disable authentication (default: "true" when Firebase config is present)
-- **AUTH_WHITELIST_PATHS**: Comma-separated list of paths that don't require authentication (e.g., "/api/public/_,/api/webhooks/_")
 
 #### Default Whitelisted Paths
 
@@ -112,11 +111,6 @@ The following paths are automatically whitelisted and don't require authenticati
 - `/health`
 - `/api/health`
 - `/api/public`
-- `/api/auth/login`
-- `/api/auth/register`
-- `/api/auth/forgot-password`
-
-You can add additional whitelisted paths using the `AUTH_WHITELIST_PATHS` environment variable.
 
 > **Security Note**: Use placeholder values in `wrangler.jsonc` and set actual production values as secrets. Secrets always take precedence over environment variables.
 

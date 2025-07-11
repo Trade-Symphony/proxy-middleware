@@ -53,8 +53,7 @@ For development, you can add the values to your `wrangler.jsonc`:
     "FIREBASE_PROJECT_ID": "your-firebase-project-id",
     "FIREBASE_PRIVATE_KEY": "-----BEGIN PRIVATE KEY-----\\nYour private key here\\n-----END PRIVATE KEY-----\\n",
     "FIREBASE_CLIENT_EMAIL": "firebase-adminsdk-xxxxx@your-project.iam.gserviceaccount.com",
-    "AUTH_REQUIRED": "true",
-    "AUTH_WHITELIST_PATHS": "/api/public/*,/api/webhooks/*"
+    "AUTH_REQUIRED": "true"
   }
 }
 ```
@@ -73,7 +72,6 @@ wrangler secret put FIREBASE_CLIENT_EMAIL
 
 # Optional: Override authentication settings
 wrangler secret put AUTH_REQUIRED
-wrangler secret put AUTH_WHITELIST_PATHS
 ```
 
 ## Step 4: Configure Authentication Settings
@@ -83,22 +81,6 @@ wrangler secret put AUTH_WHITELIST_PATHS
 - `"true"` (default): Authentication is required for non-whitelisted paths
 - `"false"`: Authentication is disabled globally
 
-### AUTH_WHITELIST_PATHS
-
-Comma-separated list of paths that don't require authentication.
-
-**Examples:**
-
-```
-"/api/public/*,/api/webhooks/*,/api/status"
-```
-
-**Patterns:**
-
-- Exact match: `/api/status`
-- Wildcard: `/api/public/*` (matches `/api/public/anything`)
-- Prefix: `/api/public*` (matches `/api/public` and `/api/publicdata`)
-
 ### Default Whitelisted Paths
 
 These paths are automatically whitelisted:
@@ -106,9 +88,6 @@ These paths are automatically whitelisted:
 - `/health`
 - `/api/health`
 - `/api/public`
-- `/api/auth/login`
-- `/api/auth/register`
-- `/api/auth/forgot-password`
 
 ## Step 5: Client-Side Integration
 
@@ -217,12 +196,11 @@ You can verify your configuration by checking these endpoints:
 
 ## Environment Variable Reference
 
-| Variable                | Required | Description                  | Example                                                |
-| ----------------------- | -------- | ---------------------------- | ------------------------------------------------------ |
-| `FIREBASE_PROJECT_ID`   | Yes\*    | Firebase project ID          | `my-app-12345`                                         |
-| `FIREBASE_PRIVATE_KEY`  | Yes\*    | Service account private key  | `-----BEGIN PRIVATE KEY-----\n...`                     |
-| `FIREBASE_CLIENT_EMAIL` | Yes\*    | Service account email        | `firebase-adminsdk-xxx@my-app.iam.gserviceaccount.com` |
-| `AUTH_REQUIRED`         | No       | Enable/disable auth          | `true` (default) or `false`                            |
-| `AUTH_WHITELIST_PATHS`  | No       | Additional whitelisted paths | `/api/public/*,/api/webhooks/*`                        |
+| Variable                | Required | Description                 | Example                                                |
+| ----------------------- | -------- | --------------------------- | ------------------------------------------------------ |
+| `FIREBASE_PROJECT_ID`   | Yes\*    | Firebase project ID         | `my-app-12345`                                         |
+| `FIREBASE_PRIVATE_KEY`  | Yes\*    | Service account private key | `-----BEGIN PRIVATE KEY-----\n...`                     |
+| `FIREBASE_CLIENT_EMAIL` | Yes\*    | Service account email       | `firebase-adminsdk-xxx@my-app.iam.gserviceaccount.com` |
+| `AUTH_REQUIRED`         | No       | Enable/disable auth         | `true` (default) or `false`                            |
 
 \*Required only if you want to enable Firebase authentication. If any Firebase variable is missing, authentication will be disabled.
