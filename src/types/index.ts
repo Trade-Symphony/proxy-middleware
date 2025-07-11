@@ -18,12 +18,30 @@ export interface HealthCheckResponse {
 }
 
 /**
+ * Firebase configuration interface
+ */
+export interface FirebaseConfig {
+  projectId: string;
+  privateKey: string;
+  clientEmail: string;
+}
+
+/**
+ * Authentication configuration interface
+ */
+export interface AuthConfig {
+  firebase: FirebaseConfig;
+  requireAuth: boolean;
+}
+
+/**
  * Proxy configuration interface
  */
 export interface ProxyConfig {
   apiServiceUrl: string;
   apiKey: string;
   allowedOrigin: string;
+  auth?: AuthConfig;
 }
 
 /**

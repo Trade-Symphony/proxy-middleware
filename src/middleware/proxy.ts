@@ -3,6 +3,7 @@ import type { ProxyConfig, ProxyRequestOptions } from '../types/index.js';
 import { wrapInStandardFormat, isStandardResponse } from '../utils/response.js';
 import { ConfigurationError, ProxyError, handleError } from '../utils/errors.js';
 import { createPreflightHeaders, applyCorsHeaders } from '../utils/cors.js';
+import { authenticateRequest, createAuthConfig } from '../utils/auth.js';
 
 /**
  * Headers that should not be forwarded to the target service
@@ -34,7 +35,7 @@ const SKIP_RESPONSE_HEADERS = new Set([
 /**
  * Validate proxy configuration from environment variables
  */
-function getProxyConfig(env: any): ProxyConfig {
+function getProxyConfig(env: CloudflareBindings): ProxyConfig {
   const { API_SERVICE_URL, API_KEY, ALLOWED_ORIGIN } = env;
 
   if (!API_SERVICE_URL) {
@@ -52,10 +53,14 @@ function getProxyConfig(env: any): ProxyConfig {
     throw new ConfigurationError("ALLOWED_ORIGIN is required", "ALLOWED_ORIGIN");
   }
 
+  // Create authentication configuration (optional)
+  const authConfig = createAuthConfig(env);
+
   return {
     apiServiceUrl: API_SERVICE_URL,
     apiKey: API_KEY,
     allowedOrigin: ALLOWED_ORIGIN,
+    auth: authConfig,
   };
 }
 
@@ -213,6 +218,12 @@ export async function proxyMiddleware(c: Context): Promise<Response> {
 
     const startTime = Date.now();
     const originalPath = new URL(c.req.url).pathname;
+
+    // Authenticate request if authentication is configured
+    if (config.auth) {
+      const authHeader = c.req.header('Authorization') || null;
+      await authenticateRequest(authHeader, originalPath, config.auth);
+    }
 
     // Build target URL
     const targetUrl = buildTargetUrl(c.req.url, config.apiServiceUrl);
