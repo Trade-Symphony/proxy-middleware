@@ -62,3 +62,31 @@ export interface ProxyResponseMetadata {
   status: number;
   originalPath: string;
 }
+
+/**
+ * Rate limiting configuration interface
+ */
+export interface RateLimitConfig {
+  windowSizeMs: number;
+  maxRequests: number;
+  warningThreshold: number;
+}
+
+/**
+ * Rate limit result interface
+ */
+export interface RateLimitResult {
+  allowed: boolean;
+  remainingRequests: number;
+  resetTime: number;
+  retryAfter?: number;
+}
+
+/**
+ * Rate limit window data stored in Durable Object
+ */
+export interface RateLimitWindow {
+  requests: number[];
+  windowStart: number;
+  lastActivity: number;
+}
