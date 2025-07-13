@@ -6,24 +6,8 @@ import { rateLimitConfig } from '../config/rate-limit.js';
  * Extract client IP address from request
  */
 export function getClientIP(c: Context): string {
-  // Try various headers in order of preference
-  const headers = [
-    'cf-connecting-ip',
-    'x-forwarded-for',
-    'x-real-ip',
-    'x-client-ip'
-  ];
-
-  for (const header of headers) {
-    const ip = c.req.header(header);
-    if (ip) {
-      // For X-Forwarded-For, take the first IP (client IP)
-      return ip.split(',')[0].trim();
-    }
-  }
-
-  // Fallback to 'unknown' if no IP found
-  return 'unknown';
+  const ip = c.req.header('cf-connecting-ip');
+  return ip ? ip.trim() : 'unknown';
 }
 
 /**
