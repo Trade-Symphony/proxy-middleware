@@ -1,5 +1,6 @@
 import type { Context } from 'hono';
 import type { RateLimitConfig, RateLimitResult } from '../types/index.js';
+import { rateLimitConfig } from '../config/rate-limit.js';
 
 /**
  * Extract client IP address from request
@@ -38,8 +39,8 @@ function getRateLimiterStub(ip: string, env: CloudflareBindings): DurableObjectS
  */
 export async function checkRateLimit(
   clientIP: string,
-  config: RateLimitConfig,
-  env: CloudflareBindings
+  env: CloudflareBindings,
+  config: RateLimitConfig = rateLimitConfig
 ): Promise<RateLimitResult> {
   try {
     const rateLimiterStub = getRateLimiterStub(clientIP, env);
@@ -75,7 +76,10 @@ export async function checkRateLimit(
 /**
  * Create rate limit headers for response
  */
-export function createRateLimitHeaders(result: RateLimitResult, config: RateLimitConfig): Headers {
+export function createRateLimitHeaders(
+  result: RateLimitResult,
+  config: RateLimitConfig = rateLimitConfig
+): Headers {
   const headers = new Headers();
 
   headers.set('X-RateLimit-Limit', config.maxRequests.toString());

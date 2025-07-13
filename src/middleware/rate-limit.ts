@@ -6,18 +6,13 @@ import { createStandardResponse } from '../utils/response.js';
  * Rate limiting middleware - applied globally to all routes
  */
 export async function rateLimitMiddleware(c: Context, next: Next): Promise<Response | void> {
-  const config = {
-    windowSizeMs: 60 * 1000, // 1 minute
-    maxRequests: 100,        // 100 requests per minute
-  }
-
   const clientIP = getClientIP(c);
 
   try {
-    const result = await checkRateLimit(clientIP, config, c.env);
+    const result = await checkRateLimit(clientIP, c.env);
 
     // Add rate limit headers to response
-    const rateLimitHeaders = createRateLimitHeaders(result, config);
+    const rateLimitHeaders = createRateLimitHeaders(result);
     rateLimitHeaders.forEach((value, key) => {
       c.res.headers.set(key, value);
     });

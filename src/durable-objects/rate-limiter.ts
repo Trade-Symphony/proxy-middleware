@@ -1,8 +1,10 @@
+import { rateLimitConfig } from '../config/rate-limit.js';
 import type { RateLimitConfig, RateLimitResult, RateLimitWindow } from '../types/index.js';
 
 export class RateLimiterDO {
   private state: DurableObjectState;
   private cleanupAlarm: number | null = null;
+  private config: RateLimitConfig = rateLimitConfig;
 
   constructor(state: DurableObjectState) {
     this.state = state;
@@ -29,9 +31,8 @@ export class RateLimiterDO {
 
     if (windowData) {
       const now = Date.now();
-      const inactivityThreshold = 60 * 1000; // 60 seconds
 
-      if (now - windowData.lastActivity > inactivityThreshold) {
+      if (now - windowData.lastActivity > this.config.windowSizeMs) {
         // Clear all data and let the object be garbage collected
         await this.state.storage.deleteAll();
         console.log('[RATE LIMITER] Cleaned up inactive rate limiter object');
@@ -67,7 +68,7 @@ export class RateLimiterDO {
     windowData.lastActivity = now;
 
     // Clean old requests outside the sliding window
-    const windowStart = now - config.windowSizeMs;
+    const windowStart = now - this.config.windowSizeMs;
     windowData.requests = windowData.requests.filter(timestamp => timestamp >= windowStart);
 
     // Check if we can allow this request
@@ -91,7 +92,7 @@ export class RateLimiterDO {
 
     // Calculate reset time (when the oldest request will expire)
     const oldestRequest = windowData.requests[0] || now;
-    const resetTime = oldestRequest + config.windowSizeMs;
+    const resetTime = oldestRequest + this.config.windowSizeMs;
     const retryAfter = allowed ? undefined : Math.ceil((resetTime - now) / 1000);
 
     return {
