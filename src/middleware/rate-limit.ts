@@ -1,11 +1,13 @@
 import type { Context, Next } from 'hono';
 import { getClientIP, checkRateLimit, createRateLimitHeaders } from '../utils/rate-limit.js';
 import { createStandardResponse } from '../utils/response.js';
+import { RateLimitConfig } from '../types/index.js';
+import { rateLimitConfig } from '../config/rate-limit.js';
 
 /**
  * Rate limiting middleware - applied globally to all routes
  */
-export async function rateLimitMiddleware(c: Context, next: Next): Promise<Response | void> {
+export async function rateLimitMiddleware(c: Context, next: Next, config: RateLimitConfig = rateLimitConfig): Promise<Response | void> {
   const clientIP = getClientIP(c);
 
   try {
@@ -32,7 +34,7 @@ export async function rateLimitMiddleware(c: Context, next: Next): Promise<Respo
     }
 
     // Log rate limit info for monitoring
-    if (result.remainingRequests <= 10) {
+    if (result.remainingRequests <= config.warningThreshold) {
       console.warn(`[RATE LIMIT] IP ${clientIP} approaching limit: ${result.remainingRequests} requests remaining`);
     }
 

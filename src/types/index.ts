@@ -69,6 +69,7 @@ export interface ProxyResponseMetadata {
 export interface RateLimitConfig {
   windowSizeMs: number;
   maxRequests: number;
+  warningThreshold: number;
 }
 
 /**
