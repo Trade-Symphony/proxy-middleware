@@ -6,11 +6,11 @@ import { createStandardResponse } from "./utils/response.js";
 
 const app = new Hono<{ Bindings: CloudflareBindings }>();
 
-// Apply rate limiting globally to all routes
-app.use("*", rateLimitMiddleware);
-
 // Health check endpoint
 app.get("/health", healthCheck);
+
+// Apply rate limiting globally to every route except /health
+app.use("*", rateLimitMiddleware);
 
 // Proxy middleware for /api/* routes
 app.all("/api/*", proxyMiddleware);
