@@ -62,6 +62,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@cloudflare/workers-types@npm:^4.20230904.0":
+  version: 4.20250712.0
+  resolution: "@cloudflare/workers-types@npm:4.20250712.0"
+  checksum: 10c0/064a68dd0961f3fb138bed5da01ec3120a2311c255c71e6e397132b99f45b0dffafc00e3aaaac5f2f8d190bc83201be892aa57784979399d7f1840f12c8fbd45
+  languageName: node
+  linkType: hard
+
 "@cspotcode/source-map-support@npm:0.8.1":
   version: 0.8.1
   resolution: "@cspotcode/source-map-support@npm:0.8.1"
@@ -670,6 +677,55 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@logtail/core@npm:^0.5.4":
+  version: 0.5.4
+  resolution: "@logtail/core@npm:0.5.4"
+  dependencies:
+    "@logtail/tools": "npm:^0.5.4"
+    "@logtail/types": "npm:^0.5.3"
+    serialize-error: "npm:8.1.0"
+  checksum: 10c0/41b5075fb49f0bcb22852f54b0d1743b772a30bd5bd9865694d6e9e2a0d43843c319d8cf75d2c5562de44ace119d8f5a73df6429e67ef04f41e8c1ebe10b61e5
+  languageName: node
+  linkType: hard
+
+"@logtail/edge@npm:^0.5.5":
+  version: 0.5.5
+  resolution: "@logtail/edge@npm:0.5.5"
+  dependencies:
+    "@cloudflare/workers-types": "npm:^4.20230904.0"
+    "@logtail/core": "npm:^0.5.4"
+    "@logtail/types": "npm:^0.5.3"
+    "@msgpack/msgpack": "npm:^2.5.1"
+    "@types/stack-trace": "npm:^0.0.33"
+    minimatch: "npm:^9.0.5"
+    stack-trace: "npm:0.0.10"
+  checksum: 10c0/a7026542b295e7ba10c3190bd093c0bf4ddb2215b09c4b667e789d2bfbbe38891f00d1a263927e8914d1cefc7565112c7339b13b95686730163122f9ca12b4ec
+  languageName: node
+  linkType: hard
+
+"@logtail/tools@npm:^0.5.4":
+  version: 0.5.4
+  resolution: "@logtail/tools@npm:0.5.4"
+  dependencies:
+    "@logtail/types": "npm:^0.5.3"
+  checksum: 10c0/d88df09ba48714da004be511120433b0a304ea5af20dc1ea52c145fe454f48f34f2e849fda64c397b5fcf763d4e0f0432decedd18b72c9f38b0c5e08a11b6f52
+  languageName: node
+  linkType: hard
+
+"@logtail/types@npm:^0.5.3":
+  version: 0.5.3
+  resolution: "@logtail/types@npm:0.5.3"
+  checksum: 10c0/84ec27df1e1b9af76ffee052db7817ec0fa32ecd549ee5d4693ecacba85d567d4d6554e810d1978b3368890bc0961d7eca2b0653bab0634d496a501f826ff632
+  languageName: node
+  linkType: hard
+
+"@msgpack/msgpack@npm:^2.5.1":
+  version: 2.8.0
+  resolution: "@msgpack/msgpack@npm:2.8.0"
+  checksum: 10c0/5964ed3daad9ccf314238da81c91152dc693bca167b2469445c1d3ce0495443612e543d052281061a91ec48ed44a6a49dd3a334b5d0dbe2dc2db6ea6143e5787
+  languageName: node
+  linkType: hard
+
 "@npmcli/agent@npm:^3.0.0":
   version: 3.0.0
   resolution: "@npmcli/agent@npm:3.0.0"
@@ -977,6 +1033,13 @@ __metadata:
     "@types/node": "npm:*"
     "@types/send": "npm:*"
   checksum: 10c0/8ad86a25b87da5276cb1008c43c74667ff7583904d46d5fcaf0355887869d859d453d7dc4f890788ae04705c23720e9b6b6f3215e2d1d2a4278bbd090a9268dd
+  languageName: node
+  linkType: hard
+
+"@types/stack-trace@npm:^0.0.33":
+  version: 0.0.33
+  resolution: "@types/stack-trace@npm:0.0.33"
+  checksum: 10c0/cc8345f042f5de17f960652974d67aac71bf864b748f3efbd10a8c5315c0a7a8a13ab17931c239b9fe6b531a44378347509dc8a97a24dfa1247b93af3f943650
   languageName: node
   linkType: hard
 
@@ -2269,7 +2332,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"minimatch@npm:^9.0.4":
+"minimatch@npm:^9.0.4, minimatch@npm:^9.0.5":
   version: 9.0.5
   resolution: "minimatch@npm:9.0.5"
   dependencies:
@@ -2563,6 +2626,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "proxy-middleware@workspace:."
   dependencies:
+    "@logtail/edge": "npm:^0.5.5"
     firebase-admin: "npm:^13.4.0"
     hono: "npm:^4.8.4"
     wrangler: "npm:^4.24.3"
@@ -2632,6 +2696,15 @@ __metadata:
   bin:
     semver: bin/semver.js
   checksum: 10c0/aca305edfbf2383c22571cb7714f48cadc7ac95371b4b52362fb8eeffdfbc0de0669368b82b2b15978f8848f01d7114da65697e56cd8c37b0dab8c58e543f9ea
+  languageName: node
+  linkType: hard
+
+"serialize-error@npm:8.1.0":
+  version: 8.1.0
+  resolution: "serialize-error@npm:8.1.0"
+  dependencies:
+    type-fest: "npm:^0.20.2"
+  checksum: 10c0/8cfd89f43ca93e283c5f1d16178a536bdfac9bc6029f4a9df988610cc399bc4f2478d1f10ce40b9dff66b863a5158a19b438fbec929045c96d92174f6bca1e88
   languageName: node
   linkType: hard
 
@@ -2780,6 +2853,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"stack-trace@npm:0.0.10":
+  version: 0.0.10
+  resolution: "stack-trace@npm:0.0.10"
+  checksum: 10c0/9ff3dabfad4049b635a85456f927a075c9d0c210e3ea336412d18220b2a86cbb9b13ec46d6c37b70a302a4ea4d49e30e5d4944dd60ae784073f1cde778ac8f4b
+  languageName: node
+  linkType: hard
+
 "stoppable@npm:1.1.0":
   version: 1.1.0
   resolution: "stoppable@npm:1.1.0"
@@ -2921,6 +3001,13 @@ __metadata:
   version: 2.8.1
   resolution: "tslib@npm:2.8.1"
   checksum: 10c0/9c4759110a19c53f992d9aae23aac5ced636e99887b51b9e61def52611732872ff7668757d4e4c61f19691e36f4da981cd9485e869b4a7408d689f6bf1f14e62
+  languageName: node
+  linkType: hard
+
+"type-fest@npm:^0.20.2":
+  version: 0.20.2
+  resolution: "type-fest@npm:0.20.2"
+  checksum: 10c0/dea9df45ea1f0aaa4e2d3bed3f9a0bfe9e5b2592bddb92eb1bf06e50bcf98dbb78189668cd8bc31a0511d3fc25539b4cd5c704497e53e93e2d40ca764b10bfc3
   languageName: node
   linkType: hard
 
