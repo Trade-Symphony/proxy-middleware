@@ -41,7 +41,7 @@ function initializeFirebase(config: AuthConfig): void {
 /**
  * Verify Firebase ID token
  */
-export async function verifyFirebaseToken(idToken: string, c: Context): Promise<DecodedIdToken> {
+export async function verifyFirebaseToken(idToken: string): Promise<DecodedIdToken> {
   try {
     const decodedToken = await admin.auth().verifyIdToken(idToken);
     return decodedToken as DecodedIdToken;
@@ -119,7 +119,7 @@ export async function authenticateRequest(
   }
 
   // Verify the Firebase token
-  const userToken = await verifyFirebaseToken(token, c);
+  const userToken = await verifyFirebaseToken(token);
   logger.log(`[AUTH] Successfully authenticated user: ${userToken.uid}`);
 
   return userToken;
