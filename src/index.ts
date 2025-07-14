@@ -3,7 +3,6 @@ import { healthCheck } from "./routes/health.js";
 import { proxyMiddleware } from "./middleware/proxy.js";
 import { rateLimitMiddleware } from "./middleware/rate-limit.js";
 import { createStandardResponse } from "./utils/response.js";
-import { Logtail } from "@logtail/edge";
 import { createLogger } from "./utils/logger.js";
 import { EdgeWithExecutionContext } from "@logtail/edge/dist/es6/edgeWithExecutionContext.js";
 
