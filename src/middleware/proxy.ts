@@ -4,6 +4,7 @@ import { wrapInStandardFormat, isStandardResponse } from '../utils/response.js';
 import { ConfigurationError, ProxyError, handleError } from '../utils/errors.js';
 import { createPreflightHeaders, applyCorsHeaders } from '../utils/cors.js';
 import { authenticateRequest, createAuthConfig } from '../utils/auth.js';
+import { getLogger } from '../utils/logger.js';
 
 /**
  * Headers that should not be forwarded to the target service
@@ -35,21 +36,23 @@ const SKIP_RESPONSE_HEADERS = new Set([
 /**
  * Validate proxy configuration from environment variables
  */
-function getProxyConfig(env: CloudflareBindings): ProxyConfig {
+function getProxyConfig(c: Context): ProxyConfig {
+  const env = c.env as CloudflareBindings;
   const { API_SERVICE_URL, API_KEY, ALLOWED_ORIGIN } = env;
+  const logger = getLogger(c);
 
   if (!API_SERVICE_URL) {
-    console.error("API_SERVICE_URL environment variable is not configured");
+    logger.error("API_SERVICE_URL environment variable is not configured");
     throw new ConfigurationError("API_SERVICE_URL is required", "API_SERVICE_URL");
   }
 
   if (!API_KEY) {
-    console.error("API_KEY environment variable is not configured");
+    logger.error("API_KEY environment variable is not configured");
     throw new ConfigurationError("API_KEY is required", "API_KEY");
   }
 
   if (!ALLOWED_ORIGIN) {
-    console.error("ALLOWED_ORIGIN environment variable is not configured");
+    logger.error("ALLOWED_ORIGIN environment variable is not configured");
     throw new ConfigurationError("ALLOWED_ORIGIN is required", "ALLOWED_ORIGIN");
   }
 
@@ -129,8 +132,9 @@ function prepareResponseHeaders(originalHeaders: Headers, config: ProxyConfig): 
 /**
  * Process the response body and wrap in standard format if needed
  */
-async function processResponseBody(response: Response): Promise<any> {
+async function processResponseBody(response: Response, c: Context): Promise<any> {
   const contentType = response.headers.get('content-type');
+  const logger = getLogger(c);
 
   if (contentType && contentType.includes('application/json')) {
     try {
@@ -149,7 +153,7 @@ async function processResponseBody(response: Response): Promise<any> {
         response.status
       );
     } catch (jsonError) {
-      console.warn(`[PROXY] Failed to parse JSON response: ${jsonError}`);
+      logger.error(`[PROXY] Failed to parse JSON response`, jsonError as Error);
       throw new ProxyError('Failed to parse JSON response', response.status);
     }
   }
@@ -187,9 +191,11 @@ function logProxyRequest(
   method: string,
   originalPath: string,
   status: number,
-  duration: number
+  duration: number,
+  c: Context
 ): void {
-  console.log(`[PROXY] ${method} ${originalPath} -> ${status} (${duration}ms)`);
+  const logger = getLogger(c);
+  logger.log(`[PROXY] ${method} ${originalPath} -> ${status} (${duration}ms)`);
 }
 
 /**
@@ -208,8 +214,9 @@ function handlePreflightRequest(config: ProxyConfig): Response {
  * Main proxy middleware function
  */
 export async function proxyMiddleware(c: Context): Promise<Response> {
+  const logger = getLogger(c);
   try {
-    const config = getProxyConfig(c.env);
+    const config = getProxyConfig(c);
 
     // Handle OPTIONS preflight requests
     if (c.req.method === 'OPTIONS') {
@@ -248,13 +255,13 @@ export async function proxyMiddleware(c: Context): Promise<Response> {
     const duration = Date.now() - startTime;
 
     // Log the request for observability
-    logProxyRequest(c.req.method, originalPath, response.status, duration);
+    logProxyRequest(c.req.method, originalPath, response.status, duration, c);
 
     // Prepare response headers
     const responseHeaders = prepareResponseHeaders(response.headers, config);
 
     // Process response body
-    const processedBody = await processResponseBody(response);
+    const processedBody = await processResponseBody(response, c);
 
     // If it's JSON data (standard response), return it with the context
     if (typeof processedBody === 'object' && processedBody !== null) {
@@ -273,7 +280,7 @@ export async function proxyMiddleware(c: Context): Promise<Response> {
     });
 
   } catch (error) {
-    console.error(`[PROXY ERROR] ${c.req.method} ${c.req.url}:`, error);
+    logger.error(`[PROXY ERROR] ${c.req.method} ${c.req.url}:`);
 
     if (error instanceof ConfigurationError) {
       return c.json(handleError(error, 500), 500);
