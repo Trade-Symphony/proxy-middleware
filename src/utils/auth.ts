@@ -2,6 +2,8 @@ import * as admin from 'firebase-admin';
 import type { AuthConfig } from '../types/index.js';
 import { ConfigurationError, ProxyError } from './errors.js';
 import { DecodedIdToken } from 'firebase-admin/auth';
+import { Context } from 'hono';
+import { getLogger } from './logger.js';
 
 /**
  * Default whitelisted paths that don't require authentication
@@ -15,7 +17,8 @@ const WHITELISTED_PATHS = [
 /**
  * Initialize Firebase Admin SDK
  */
-function initializeFirebase(config: AuthConfig): void {
+function initializeFirebase(config: AuthConfig, c: Context): void {
+  const logger = getLogger(c);
   try {
     // Check if Firebase is already initialized
     if (admin.apps.length === 0) {
@@ -29,7 +32,7 @@ function initializeFirebase(config: AuthConfig): void {
       });
     }
   } catch (error) {
-    console.error('[AUTH] Failed to initialize Firebase:', error);
+    logger.error('[AUTH] Failed to initialize Firebase:', error as Error);
     throw new ConfigurationError(
       'Failed to initialize Firebase Admin SDK',
       'FIREBASE_CONFIG'
@@ -40,12 +43,13 @@ function initializeFirebase(config: AuthConfig): void {
 /**
  * Verify Firebase ID token
  */
-export async function verifyFirebaseToken(idToken: string): Promise<DecodedIdToken> {
+export async function verifyFirebaseToken(idToken: string, c: Context): Promise<DecodedIdToken> {
+  const logger = getLogger(c);
   try {
     const decodedToken = await admin.auth().verifyIdToken(idToken);
     return decodedToken as DecodedIdToken;
   } catch (error) {
-    console.error('[AUTH] Token verification failed:', error);
+    logger.error('[AUTH] Token verification failed:', error as Error);
     throw new ProxyError('Invalid or expired authentication token', 401);
   }
 }
@@ -98,14 +102,17 @@ export function extractBearerToken(authHeader: string | null): string | null {
 export async function authenticateRequest(
   authHeader: string | null,
   path: string,
-  config: AuthConfig
+  config: AuthConfig,
+  c: Context
 ): Promise<DecodedIdToken | null> {
+  const logger = getLogger(c);
+
   // Initialize Firebase if not already done
-  initializeFirebase(config);
+  initializeFirebase(config, c);
 
   // Check if authentication is required for this path
   if (!config.requireAuth || isPathWhitelisted(path)) {
-    console.log(`[AUTH] Path ${path} is whitelisted, skipping authentication`);
+    logger.log(`[AUTH] Path ${path} is whitelisted, skipping authentication`);
     return null;
   }
 
@@ -116,8 +123,8 @@ export async function authenticateRequest(
   }
 
   // Verify the Firebase token
-  const userToken = await verifyFirebaseToken(token);
-  console.log(`[AUTH] Successfully authenticated user: ${userToken.uid}`);
+  const userToken = await verifyFirebaseToken(token, c);
+  logger.log(`[AUTH] Successfully authenticated user: ${userToken.uid}`);
 
   return userToken;
 }
@@ -125,7 +132,7 @@ export async function authenticateRequest(
 /**
  * Create authentication configuration from environment variables
  */
-export function createAuthConfig(env: CloudflareBindings): AuthConfig | undefined {
+export function createAuthConfig(env: CloudflareBindings, c: Context): AuthConfig | undefined {
   const {
     FIREBASE_PROJECT_ID,
     FIREBASE_PRIVATE_KEY,
@@ -133,9 +140,11 @@ export function createAuthConfig(env: CloudflareBindings): AuthConfig | undefine
     AUTH_REQUIRED,
   } = env;
 
+  const logger = getLogger(c);
+
   // If no Firebase config is provided, authentication is disabled
   if (!FIREBASE_PROJECT_ID || !FIREBASE_PRIVATE_KEY || !FIREBASE_CLIENT_EMAIL) {
-    console.log('[AUTH] Firebase configuration not found, authentication disabled');
+    logger.log('[AUTH] Firebase configuration not found, authentication disabled');
     return undefined;
   }
 

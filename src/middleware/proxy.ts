@@ -57,7 +57,7 @@ function getProxyConfig(c: Context): ProxyConfig {
   }
 
   // Create authentication configuration (optional)
-  const authConfig = createAuthConfig(env);
+  const authConfig = createAuthConfig(env, c);
 
   return {
     apiServiceUrl: API_SERVICE_URL,
@@ -229,7 +229,7 @@ export async function proxyMiddleware(c: Context): Promise<Response> {
     // Authenticate request if authentication is configured
     if (config.auth) {
       const authHeader = c.req.header('Authorization') || null;
-      await authenticateRequest(authHeader, originalPath, config.auth);
+      await authenticateRequest(authHeader, originalPath, config.auth, c);
     }
 
     // Build target URL
