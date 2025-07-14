@@ -13,7 +13,7 @@ export async function rateLimitMiddleware(c: Context, next: Next, config: RateLi
   const logger = getLogger(c);
 
   try {
-    const result = await checkRateLimit(clientIP, c);
+    const result = await checkRateLimit(clientIP, c.env);
 
     // Add rate limit headers to response
     const rateLimitHeaders = createRateLimitHeaders(result);

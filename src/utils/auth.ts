@@ -17,8 +17,7 @@ const WHITELISTED_PATHS = [
 /**
  * Initialize Firebase Admin SDK
  */
-function initializeFirebase(config: AuthConfig, c: Context): void {
-  const logger = getLogger(c);
+function initializeFirebase(config: AuthConfig): void {
   try {
     // Check if Firebase is already initialized
     if (admin.apps.length === 0) {
@@ -32,7 +31,6 @@ function initializeFirebase(config: AuthConfig, c: Context): void {
       });
     }
   } catch (error) {
-    logger.error('[AUTH] Failed to initialize Firebase:', error as Error);
     throw new ConfigurationError(
       'Failed to initialize Firebase Admin SDK',
       'FIREBASE_CONFIG'
@@ -44,12 +42,10 @@ function initializeFirebase(config: AuthConfig, c: Context): void {
  * Verify Firebase ID token
  */
 export async function verifyFirebaseToken(idToken: string, c: Context): Promise<DecodedIdToken> {
-  const logger = getLogger(c);
   try {
     const decodedToken = await admin.auth().verifyIdToken(idToken);
     return decodedToken as DecodedIdToken;
   } catch (error) {
-    logger.error('[AUTH] Token verification failed:', error as Error);
     throw new ProxyError('Invalid or expired authentication token', 401);
   }
 }
@@ -108,7 +104,7 @@ export async function authenticateRequest(
   const logger = getLogger(c);
 
   // Initialize Firebase if not already done
-  initializeFirebase(config, c);
+  initializeFirebase(config);
 
   // Check if authentication is required for this path
   if (!config.requireAuth || isPathWhitelisted(path)) {

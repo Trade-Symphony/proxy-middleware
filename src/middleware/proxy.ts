@@ -39,20 +39,16 @@ const SKIP_RESPONSE_HEADERS = new Set([
 function getProxyConfig(c: Context): ProxyConfig {
   const env = c.env as CloudflareBindings;
   const { API_SERVICE_URL, API_KEY, ALLOWED_ORIGIN } = env;
-  const logger = getLogger(c);
 
   if (!API_SERVICE_URL) {
-    logger.error("API_SERVICE_URL environment variable is not configured");
     throw new ConfigurationError("API_SERVICE_URL is required", "API_SERVICE_URL");
   }
 
   if (!API_KEY) {
-    logger.error("API_KEY environment variable is not configured");
     throw new ConfigurationError("API_KEY is required", "API_KEY");
   }
 
   if (!ALLOWED_ORIGIN) {
-    logger.error("ALLOWED_ORIGIN environment variable is not configured");
     throw new ConfigurationError("ALLOWED_ORIGIN is required", "ALLOWED_ORIGIN");
   }
 
@@ -132,9 +128,8 @@ function prepareResponseHeaders(originalHeaders: Headers, config: ProxyConfig): 
 /**
  * Process the response body and wrap in standard format if needed
  */
-async function processResponseBody(response: Response, c: Context): Promise<any> {
+async function processResponseBody(response: Response): Promise<any> {
   const contentType = response.headers.get('content-type');
-  const logger = getLogger(c);
 
   if (contentType && contentType.includes('application/json')) {
     try {
@@ -153,8 +148,7 @@ async function processResponseBody(response: Response, c: Context): Promise<any>
         response.status
       );
     } catch (jsonError) {
-      logger.error(`[PROXY] Failed to parse JSON response`, jsonError as Error);
-      throw new ProxyError('Failed to parse JSON response', response.status);
+      throw new ProxyError('Failed to parse JSON response', response.status, jsonError instanceof Error ? jsonError : undefined);
     }
   }
 
@@ -229,7 +223,19 @@ export async function proxyMiddleware(c: Context): Promise<Response> {
     // Authenticate request if authentication is configured
     if (config.auth) {
       const authHeader = c.req.header('Authorization') || null;
-      await authenticateRequest(authHeader, originalPath, config.auth, c);
+      try {
+        await authenticateRequest(authHeader, originalPath, config.auth, c);
+      } catch (authError) {
+        // Log authentication errors
+        if (authError instanceof ConfigurationError) {
+          logger.error(`[AUTH] Configuration error: ${authError.message}`);
+        } else if (authError instanceof ProxyError) {
+          logger.error(`[AUTH] Authentication failed for ${originalPath}: ${authError.message}`);
+        } else {
+          logger.error(`[AUTH] Unexpected authentication error for ${originalPath}:`, authError as Error);
+        }
+        throw authError; // Re-throw to be handled by the main error handler
+      }
     }
 
     // Build target URL
@@ -261,7 +267,7 @@ export async function proxyMiddleware(c: Context): Promise<Response> {
     const responseHeaders = prepareResponseHeaders(response.headers, config);
 
     // Process response body
-    const processedBody = await processResponseBody(response, c);
+    const processedBody = await processResponseBody(response);
 
     // If it's JSON data (standard response), return it with the context
     if (typeof processedBody === 'object' && processedBody !== null) {
@@ -280,17 +286,21 @@ export async function proxyMiddleware(c: Context): Promise<Response> {
     });
 
   } catch (error) {
-    logger.error(`[PROXY ERROR] ${c.req.method} ${c.req.url}:`);
-
     if (error instanceof ConfigurationError) {
+      logger.error(`[CONFIG ERROR] Configuration error: ${error.message} ${error.missingConfig ? `(missing: ${error.missingConfig})` : ''}`);
       return c.json(handleError(error, 500), 500);
     }
 
     if (error instanceof ProxyError) {
+      // Only log if we haven't already logged this error (authentication errors are logged above)
+      if (error.statusCode !== 401) {
+        logger.error(`[PROXY ERROR] ${c.req.method} ${c.req.url}: ${error.message}`, error.originalError);
+      }
       return c.json(handleError(error, error.statusCode), error.statusCode as any);
     }
 
     // Generic error handling
+    logger.error(`[PROXY ERROR] ${c.req.method} ${c.req.url}: ${error instanceof Error ? error.message : 'Unknown error'}`, error instanceof Error ? error : undefined);
     return c.json(handleError(error, 502), 502);
   }
 }
