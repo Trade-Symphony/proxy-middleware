@@ -28,8 +28,6 @@ export class ConfigurationError extends Error {
  * Handle and format errors into standard response format
  */
 export function handleError(error: unknown, statusCode: number = 500) {
-  console.error('[ERROR]', error);
-
   let message: string;
 
   if (error instanceof ProxyError) {
