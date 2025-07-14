@@ -1,6 +1,7 @@
 import type { Context } from 'hono';
 import type { RateLimitConfig, RateLimitResult } from '../types/index.js';
 import { rateLimitConfig } from '../config/rate-limit.js';
+import { getLogger } from './logger.js';
 
 /**
  * Extract client IP address from request
@@ -23,9 +24,11 @@ function getRateLimiterStub(ip: string, env: CloudflareBindings): DurableObjectS
  */
 export async function checkRateLimit(
   clientIP: string,
-  env: CloudflareBindings,
+  c: Context,
   config: RateLimitConfig = rateLimitConfig
 ): Promise<RateLimitResult> {
+  const logger = getLogger(c);
+  const env = c.env as CloudflareBindings;
   try {
     const rateLimiterStub = getRateLimiterStub(clientIP, env);
 
@@ -36,7 +39,7 @@ export async function checkRateLimit(
     });
 
     if (!response.ok) {
-      console.error(`Rate limiter error: ${response.status} ${response.statusText}`);
+      logger.error(`Rate limiter error: ${response.status} ${response.statusText}`);
       // Allow request on rate limiter error
       return {
         allowed: true,
@@ -47,7 +50,7 @@ export async function checkRateLimit(
 
     return await response.json() as RateLimitResult;
   } catch (error) {
-    console.error('Rate limiter fetch error:', error);
+    logger.error('Rate limiter fetch error:', error as Error);
     // Allow request on error
     return {
       allowed: true,
