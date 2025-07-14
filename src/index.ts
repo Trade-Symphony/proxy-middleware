@@ -5,15 +5,16 @@ import { rateLimitMiddleware } from "./middleware/rate-limit.js";
 import { createStandardResponse } from "./utils/response.js";
 import { Logtail } from "@logtail/edge";
 import { createLogger } from "./utils/logger.js";
+import { EdgeWithExecutionContext } from "@logtail/edge/dist/es6/edgeWithExecutionContext.js";
 
-const app = new Hono<{ Bindings: CloudflareBindings, Variables: { logger?: Logtail } }>();
+const app = new Hono<{ Bindings: CloudflareBindings, Variables: { logger?: EdgeWithExecutionContext } }>();
 
 // Health check endpoint
 app.get("/health", healthCheck);
 
 // Initialize Logger
 app.use((c, next) => {
-  const logger = createLogger(c.env);
+  const logger = createLogger(c.env, c.executionCtx);
   c.set("logger", logger);
   return next();
 })
