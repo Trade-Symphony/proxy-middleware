@@ -4,15 +4,7 @@ import { ConfigurationError, ProxyError } from './errors.js';
 import { DecodedIdToken } from 'firebase-admin/auth';
 import { Context } from 'hono';
 import { getLogger } from './logger.js';
-
-/**
- * Default whitelisted paths that don't require authentication
- */
-const WHITELISTED_PATHS = [
-  '/health',
-  '/api/health',
-  '/api/public/*',
-];
+import { WHITELISTED_PATHS } from '../config/auth.js';
 
 /**
  * Initialize Firebase Admin SDK
