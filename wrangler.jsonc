@@ -7,10 +7,6 @@
 	"name": "proxy-middleware",
 	"main": "src/index.ts",
 	"compatibility_date": "2025-07-10",
-	"assets": {
-		"binding": "ASSETS",
-		"directory": "./public"
-	},
 	"observability": {
 		"enabled": true
 	},
