@@ -6,7 +6,6 @@ import { createPreflightHeaders, applyCorsHeaders } from '../utils/cors.js';
 import { authenticateRequest, createAuthConfig } from '../utils/auth.js';
 import { getLogger } from '../utils/logger.js';
 import { SKIP_REQUEST_HEADERS, SKIP_RESPONSE_HEADERS } from '../config/proxy.js';
-import { APP_CONFIG } from '../config/app.js';
 
 /**
  * Validate proxy configuration from environment variables
@@ -92,7 +91,7 @@ function prepareResponseHeaders(originalHeaders: Headers, config: ProxyConfig): 
   }
 
   // Add proxy identification header
-  responseHeaders.set('X-Proxied-By', APP_CONFIG.name);
+  responseHeaders.set('X-Proxied-By', "trade-symphony-proxy");
 
   // Add CORS headers
   applyCorsHeaders(responseHeaders, config.allowedOrigin);

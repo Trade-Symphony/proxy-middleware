@@ -6,7 +6,6 @@
  */
 
 // Re-export all configuration modules
-export * from './app.js';
 export * from './auth.js';
 export * from './cors.js';
 export * from './proxy.js';
