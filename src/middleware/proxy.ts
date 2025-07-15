@@ -5,33 +5,8 @@ import { ConfigurationError, ProxyError, handleError } from '../utils/errors.js'
 import { createPreflightHeaders, applyCorsHeaders } from '../utils/cors.js';
 import { authenticateRequest, createAuthConfig } from '../utils/auth.js';
 import { getLogger } from '../utils/logger.js';
-
-/**
- * Headers that should not be forwarded to the target service
- */
-const SKIP_REQUEST_HEADERS = new Set([
-  'host',
-  'cf-ray',
-  'cf-connecting-ip',
-  'cf-visitor',
-  'x-forwarded-for',
-  'x-forwarded-proto',
-  'x-real-ip'
-]);
-
-/**
- * Headers that should not be forwarded from the target service response
- */
-const SKIP_RESPONSE_HEADERS = new Set([
-  'transfer-encoding',
-  'connection',
-  'keep-alive',
-  'upgrade',
-  'proxy-authenticate',
-  'proxy-authorization',
-  'te',
-  'trailers'
-]);
+import { SKIP_REQUEST_HEADERS, SKIP_RESPONSE_HEADERS } from '../config/proxy.js';
+import { APP_CONFIG } from '../config/app.js';
 
 /**
  * Validate proxy configuration from environment variables
@@ -117,7 +92,7 @@ function prepareResponseHeaders(originalHeaders: Headers, config: ProxyConfig): 
   }
 
   // Add proxy identification header
-  responseHeaders.set('X-Proxied-By', 'Trade-Symphony-Proxy');
+  responseHeaders.set('X-Proxied-By', APP_CONFIG.name);
 
   // Add CORS headers
   applyCorsHeaders(responseHeaders, config.allowedOrigin);
