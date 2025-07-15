@@ -3,11 +3,20 @@ import { healthCheck } from "./routes/health.js";
 import { proxyMiddleware } from "./middleware/proxy.js";
 import { rateLimitMiddleware } from "./middleware/rate-limit.js";
 import { createStandardResponse } from "./utils/response.js";
+import { createLogger } from "./utils/logger.js";
+import { EdgeWithExecutionContext } from "@logtail/edge/dist/es6/edgeWithExecutionContext.js";
 
-const app = new Hono<{ Bindings: CloudflareBindings }>();
+const app = new Hono<{ Bindings: CloudflareBindings, Variables: { logger?: EdgeWithExecutionContext } }>();
 
 // Health check endpoint
 app.get("/health", healthCheck);
+
+// Initialize Logger
+app.use((c, next) => {
+  const logger = createLogger(c.env, c.executionCtx);
+  c.set("logger", logger);
+  return next();
+})
 
 // Apply rate limiting globally to every route except /health
 app.use("*", rateLimitMiddleware);

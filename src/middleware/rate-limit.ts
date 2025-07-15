@@ -3,12 +3,14 @@ import { getClientIP, checkRateLimit, createRateLimitHeaders } from '../utils/ra
 import { createStandardResponse } from '../utils/response.js';
 import { RateLimitConfig } from '../types/index.js';
 import { rateLimitConfig } from '../config/rate-limit.js';
+import { getLogger } from '../utils/logger.js';
 
 /**
  * Rate limiting middleware - applied globally to all routes
  */
 export async function rateLimitMiddleware(c: Context, next: Next, config: RateLimitConfig = rateLimitConfig): Promise<Response | void> {
   const clientIP = getClientIP(c);
+  const logger = getLogger(c);
 
   try {
     const result = await checkRateLimit(clientIP, c.env);
@@ -20,7 +22,7 @@ export async function rateLimitMiddleware(c: Context, next: Next, config: RateLi
     });
 
     if (!result.allowed) {
-      console.warn(`[RATE LIMIT] Blocked request from IP: ${clientIP}`);
+      logger.warn(`[RATE LIMIT] Blocked request from IP: ${clientIP}`);
 
       return c.json(
         createStandardResponse(
@@ -35,12 +37,12 @@ export async function rateLimitMiddleware(c: Context, next: Next, config: RateLi
 
     // Log rate limit info for monitoring
     if (result.remainingRequests <= config.warningThreshold) {
-      console.warn(`[RATE LIMIT] IP ${clientIP} approaching limit: ${result.remainingRequests} requests remaining`);
+      logger.warn(`[RATE LIMIT] IP ${clientIP} approaching limit: ${result.remainingRequests} requests remaining`);
     }
 
     return next();
   } catch (error) {
-    console.error(`[RATE LIMIT] Error checking rate limit for IP ${clientIP}:`, error);
+    logger.error(`[RATE LIMIT] Error checking rate limit for IP ${clientIP}:`, error as Error);
     // Allow request on error to avoid breaking the service
     return next();
   }

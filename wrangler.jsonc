@@ -22,7 +22,9 @@
 		"FIREBASE_PROJECT_ID": "your-firebase-project-id",
 		"FIREBASE_PRIVATE_KEY": "-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n",
 		"FIREBASE_CLIENT_EMAIL": "firebase-adminsdk-xxxxx@your-project.iam.gserviceaccount.com",
-		"AUTH_REQUIRED": "true"
+		"AUTH_REQUIRED": "true",
+		"LOGTAIL_SOURCE_TOKEN": "your-logtail-source-token",
+		"LOGTAIL_ENDPOINT": "https://in.logtail.com"
 	},
 	/**
 	 * Smart Placement

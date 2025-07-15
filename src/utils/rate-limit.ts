@@ -36,24 +36,12 @@ export async function checkRateLimit(
     });
 
     if (!response.ok) {
-      console.error(`Rate limiter error: ${response.status} ${response.statusText}`);
-      // Allow request on rate limiter error
-      return {
-        allowed: true,
-        remainingRequests: config.maxRequests,
-        resetTime: Date.now() + config.windowSizeMs
-      };
+      throw new Error(`Rate limit check failed: ${response.status} ${response.statusText}`);
     }
 
     return await response.json() as RateLimitResult;
   } catch (error) {
-    console.error('Rate limiter fetch error:', error);
-    // Allow request on error
-    return {
-      allowed: true,
-      remainingRequests: config.maxRequests,
-      resetTime: Date.now() + config.windowSizeMs
-    };
+    throw error //Rethrow the error to be handled by the middleware
   }
 }
 

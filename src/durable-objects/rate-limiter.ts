@@ -35,7 +35,6 @@ export class RateLimiterDO {
       if (now - windowData.lastActivity > this.config.windowSizeMs) {
         // Clear all data and let the object be garbage collected
         await this.state.storage.deleteAll();
-        console.log('[RATE LIMITER] Cleaned up inactive rate limiter object');
         return;
       }
 
