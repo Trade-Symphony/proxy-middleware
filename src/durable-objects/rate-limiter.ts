@@ -26,7 +26,7 @@ export class RateLimiterDO {
   }
 
   async alarm(): Promise<void> {
-    // Clean up the Durable Object after 60 seconds of inactivity
+    // Clean up the Durable Object after configured inactivity timeout
     const windowData = await this.state.storage.get<RateLimitWindow>('rate_limit_window');
 
     if (windowData) {
@@ -44,7 +44,7 @@ export class RateLimiterDO {
   }
 
   private async scheduleCleanup(): Promise<void> {
-    const cleanupTime = Date.now() + 60 * 1000; // 60 seconds from now
+    const cleanupTime = Date.now() + rateLimitConfig.cleanupIntervalMs;
     await this.state.storage.setAlarm(cleanupTime);
   }
 

@@ -1,7 +1,8 @@
 import { RateLimitConfig } from "../types";
 
 export const rateLimitConfig: RateLimitConfig = {
-  windowSizeMs: 60 * 1000,   // 1 minute
-  maxRequests: 100,        // 100 requests per minute
-  warningThreshold: 10,    // Warn when remaining requests are below this threshold
+  windowSizeMs: 60 * 1000,         // 1 minute
+  maxRequests: 100,                // 100 requests per minute
+  warningThreshold: 10,            // Warn when remaining requests are below this threshold
+  cleanupIntervalMs: 60 * 1000,    // Cleanup every minute
 }
