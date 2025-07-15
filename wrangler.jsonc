@@ -14,18 +14,6 @@
 	"observability": {
 		"enabled": true
 	},
-	"vars": {
-		"API_SERVICE_URL": "https://api.example.com",
-		"API_KEY": "your-api-key-here",
-		"ALLOWED_ORIGIN": "https://yourdomain.com",
-		// Firebase Authentication Configuration (Optional)
-		"FIREBASE_PROJECT_ID": "your-firebase-project-id",
-		"FIREBASE_PRIVATE_KEY": "-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n",
-		"FIREBASE_CLIENT_EMAIL": "firebase-adminsdk-xxxxx@your-project.iam.gserviceaccount.com",
-		"AUTH_REQUIRED": "true",
-		"LOGTAIL_SOURCE_TOKEN": "your-logtail-source-token",
-		"LOGTAIL_ENDPOINT": "https://in.logtail.com"
-	},
 	/**
 	 * Smart Placement
 	 * Docs: https://developers.cloudflare.com/workers/configuration/smart-placement/#smart-placement
